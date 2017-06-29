@@ -32,7 +32,7 @@
 #include <string.h>
 #include <assert.h>
 #include "constants.h"
-#include "memory.h"
+#include "mpmemory.h"
 #include "typearith.h"
 #include "basearith.h"
 

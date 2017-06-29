@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "typearith.h"
-#include "memory.h"
+#include "mpmemory.h"
 
 
 /* Guaranteed minimum allocation for a coefficient. May be changed once
