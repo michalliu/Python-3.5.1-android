@@ -6,6 +6,7 @@ pwd = support.import_module('pwd')
 
 class PwdTest(unittest.TestCase):
 
+ @unittest.skipUnless(hasattr(pwd, 'getpwall'), 'pwd module does not expose getpwall()')
     def test_values(self):
         entries = pwd.getpwall()
 
@@ -52,6 +53,7 @@ class PwdTest(unittest.TestCase):
             self.assertIn(pwd.getpwnam(e.pw_name), entriesbyname[e.pw_name])
             self.assertIn(pwd.getpwuid(e.pw_uid), entriesbyuid[e.pw_uid])
 
+ @unittest.skipUnless(hasattr(pwd, 'getpwall'), 'pwd module does not expose getpwall()')
     def test_errors(self):
         self.assertRaises(TypeError, pwd.getpwuid)
         self.assertRaises(TypeError, pwd.getpwuid, 3.14)

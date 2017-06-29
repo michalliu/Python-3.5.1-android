@@ -44,10 +44,13 @@ main(int argc, char **argv)
     fpsetmask(m & ~FP_X_OFL);
 #endif
 
-    oldloc = _PyMem_RawStrdup(setlocale(LC_ALL, NULL));
-    if (!oldloc) {
-        fprintf(stderr, "out of memory\n");
-        return 1;
+    oldloc = setlocale(LC_ALL, NULL);
+    if (oldloc) {
+        oldloc = _PyMem_RawStrdup(oldloc);
+        if (!oldloc) {
+            fprintf(stderr, "out of memory\n");
+            return 1;
+        }
     }
 
     setlocale(LC_ALL, "");
@@ -64,8 +67,11 @@ main(int argc, char **argv)
     }
     argv_copy2[argc] = argv_copy[argc] = NULL;
 
-    setlocale(LC_ALL, oldloc);
-    PyMem_RawFree(oldloc);
+    if (oldloc) {
+        setlocale(LC_ALL, oldloc);
+        PyMem_RawFree(oldloc);
+    }
+
     res = Py_Main(argc, argv_copy);
     for (i = 0; i < argc; i++) {
         PyMem_RawFree(argv_copy2[i]);
