@@ -373,6 +373,11 @@ static int win32_can_symlink = 0;
 
 #define DWORD_MAX 4294967295U
 
+/* Android doesn't expose AT_EACCESS - manually define it. */
+#if !defined(AT_EACCESS) && defined(__ANDROID__)
+#define AT_EACCESS     0x200
+#endif
+
 #ifdef MS_WINDOWS
 #define INITFUNC PyInit_nt
 #define MODNAME "nt"

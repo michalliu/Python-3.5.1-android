@@ -731,6 +731,22 @@ fi
 MULTIARCH=$($CC --print-multiarch 2>/dev/null)
 AC_SUBST(MULTIARCH)
 
+# Test if we're running on Android.
+AC_MSG_CHECKING(if target is Android-based)
+AC_EGREP_CPP(yes,
+[
+#if __ANDROID__
+yes
+#endif
+], [
+    AC_MSG_RESULT(yes)
+    with_android=yes
+   ], [
+    AC_MSG_RESULT(no)
+    with_android=no
+   ]
+)
+
 AC_MSG_CHECKING([for the platform triplet based on compiler characteristics])
 cat >> conftest.c <<EOF
 #undef bfin
@@ -1099,7 +1115,14 @@ if test $enable_shared = "yes"; then
 	  LDLIBRARY='libpython$(LDVERSION).so'
 	  BLDLIBRARY='-L. -lpython$(LDVERSION)'
 	  RUNSHARED=LD_LIBRARY_PATH=`pwd`${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
-	  INSTSONAME="$LDLIBRARY".$SOVERSION
+
+	  if test "$with_android" != yes
+	  then
+		INSTSONAME="$LDLIBRARY".$SOVERSION
+	  else
+		INSTSONAME="$LDLIBRARY"
+	  fi
+
 	  if test "$with_pydebug" != yes
           then
 	      PY3LIBRARY=libpython3.so

@@ -18,6 +18,7 @@ import select
 import shutil
 import gc
 import textwrap
+import platform
 
 try:
     import threading
@@ -1517,7 +1518,10 @@ class POSIXProcessTestCase(BaseTestCase):
         fd, fname = tempfile.mkstemp()
         # reopen in text mode
         with open(fd, "w", errors="surrogateescape") as fobj:
-            fobj.write("#!/bin/sh\n")
+            if platform.android_version()[0]:
+                fobj.write('#!/system/bin/sh\n')
+            else:
+                fobj.write("#!/bin/sh\n")
             fobj.write("exec '%s' -c 'import sys; sys.exit(47)'\n" %
                        sys.executable)
         os.chmod(fname, 0o700)
@@ -1562,7 +1566,10 @@ class POSIXProcessTestCase(BaseTestCase):
         fd, fname = tempfile.mkstemp()
         # reopen in text mode
         with open(fd, "w", errors="surrogateescape") as fobj:
-            fobj.write("#!/bin/sh\n")
+            if platform.android_version()[0]:
+                fobj.write('#!/system/bin/sh\n')
+            else:
+                fobj.write("#!/bin/sh\n")
             fobj.write("exec '%s' -c 'import sys; sys.exit(47)'\n" %
                        sys.executable)
         os.chmod(fname, 0o700)

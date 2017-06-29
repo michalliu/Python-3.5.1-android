@@ -1433,9 +1433,21 @@ class Popen(object):
                 args = list(args)
 
             if shell:
-                args = ["/bin/sh", "-c"] + args
                 if executable:
-                    args[0] = executable
+                    main = executable
+                elif os.path.isfile('/bin/sh'):
+                    main = '/bin/sh'
+                elif os.path.isfile('/system/bin/sh'):
+                    main = '/system/bin/sh'
+                else:
+                    import platform
+                    if platform.android_version()[0]:
+                        main = '/system/bin/sh'
+                    else:
+                        raise RuntimeError('Could not find system shell')
+
+                args = [main, "-c"] + args
+
 
             if executable is None:
                 executable = args[0]

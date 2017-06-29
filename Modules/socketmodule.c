@@ -148,7 +148,7 @@ if_indextoname(index) -- return the corresponding interface name\n\
    On the other hand, not all Linux versions agree, so there the settings
    computed by the configure script are needed! */
 
-#ifndef linux
+#if !defined(linux) || __ANDROID__
 # undef HAVE_GETHOSTBYNAME_R_3_ARG
 # undef HAVE_GETHOSTBYNAME_R_5_ARG
 # undef HAVE_GETHOSTBYNAME_R_6_ARG
@@ -167,7 +167,7 @@ if_indextoname(index) -- return the corresponding interface name\n\
 #  define HAVE_GETHOSTBYNAME_R_3_ARG
 # elif defined(__sun) || defined(__sgi)
 #  define HAVE_GETHOSTBYNAME_R_5_ARG
-# elif defined(linux)
+# elif defined(linux) && !__ANDROID__
 /* Rely on the configure script */
 # else
 #  undef HAVE_GETHOSTBYNAME_R

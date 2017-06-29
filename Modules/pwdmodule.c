@@ -78,7 +78,11 @@ mkpwent(struct passwd *p)
     SETS(setIndex++, p->pw_passwd);
     PyStructSequence_SET_ITEM(v, setIndex++, _PyLong_FromUid(p->pw_uid));
     PyStructSequence_SET_ITEM(v, setIndex++, _PyLong_FromGid(p->pw_gid));
+#if !defined(__ANDROID__)
     SETS(setIndex++, p->pw_gecos);
+#else
+	SETS(setIndex++, "");
+#endif
     SETS(setIndex++, p->pw_dir);
     SETS(setIndex++, p->pw_shell);
 

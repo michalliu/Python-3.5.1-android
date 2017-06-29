@@ -383,6 +383,66 @@ def dist(distname='', version='', id='',
     return _linux_distribution(distname, version, id,
                                supported_dists=supported_dists,
                                full_distribution_name=0)
+_android_environment_vars = (
+    'ANDROID_ROOT', 'ANDROID_ASSETS', 'ANDROID_STORAGE', 'ANDROID_DATA',
+    'ANDROID_PROPERTY_WORKSPACE', 'ANDROID_BOOTLOGO')
+_android_version_property = 'ro.build.version.release'
+_android_buildstr_property = 'ro.build.version.full'
+
+def android_version(version='', buildstr=''):
+    """ Attempt to get the Android version number and build string.
+
+        The function checks for the getprop binary to retrieve build info,
+        and falls back to manually reading /system/build.prop if available.
+
+        Returns a (version, buildstr) tuple which defaults to the args given
+        as parameters.
+    """
+    if not any(os.getenv(e) for e in _android_environment_vars):
+        # Probably not on Android...
+        return version, buildstr
+
+    version_obtained = False
+    buildstr_obtained = False
+
+    # Try the 'official' API tool first, since /system/build.prop might
+    # not be the only source for properties.
+    if os.access('/system/bin/getprop', os.X_OK):
+        try:
+            output = subprocess.check_output(['/system/bin/getprop',
+                                              _android_version_property])
+            version = output.decode('ascii').strip()
+            if version:
+                version_obtained = True
+        except (subprocess.CalledProcessError, UnicodeDecodeError):
+            pass
+
+        try:
+            output = subprocess.check_output(['/system/bin/getprop',
+                                              _android_buildstr_property])
+            buildstr = output.decode('ascii').strip()
+            if buildstr:
+                buildstr_obtained = True
+        except (subprocess.CalledProcessError, UnicodeDecodeError):
+            pass
+    done = version_obtained and buildstr_obtained
+
+    # Fall back to parsing /system/build.prop manually.
+    if not done and os.path.isfile('/system/build.prop'):
+        for line in open('/system/build.prop'):
+            if '=' not in line:
+                continue
+            key, val = line.split('=')
+            key, val = line.split('=')[0:2]
+            key = key.strip()
+
+            if not version_obtained and key == _android_version_property:
+                version = val.strip()
+            elif not buildstr_obtained and key == _android_buildstr_property:
+                buildstr = val.strip()
+
+    return version, buildstr
+
 
 def popen(cmd, mode='r', bufsize=-1):
 
