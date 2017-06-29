@@ -38,6 +38,13 @@ This software comes with no warranty. Use at your own risk.
 #include <windows.h>
 #endif
 
+#if __ANDROID__
+/* Android's locale support is pretty much unusable, it's better to have the
+   higher-level module fall back to C locale emulation. */
+#error "Android's locale support is too incomplete to create a usable module."
+#endif
+
+
 PyDoc_STRVAR(locale__doc__, "Support for POSIX locales.");
 
 static PyObject *Error;
@@ -141,6 +148,11 @@ PyLocale_localeconv(PyObject* self)
     if (!result)
         return NULL;
 
+#ifdef __ANDROID__
+    /* Don't even try on Android's broken locale.h. */
+    goto failed;
+#else
+
     /* if LC_NUMERIC is different in the C library, use saved value */
     l = localeconv();
 
@@ -195,6 +207,7 @@ PyLocale_localeconv(PyObject* self)
     RESULT_INT(p_sign_posn);
     RESULT_INT(n_sign_posn);
     return result;
+#endif // __ANDROID__
 
   failed:
     Py_XDECREF(result);

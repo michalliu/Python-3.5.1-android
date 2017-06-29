@@ -549,7 +549,7 @@ Py_Main(int argc, wchar_t **argv)
         oldloc = _PyMem_RawStrdup(setlocale(LC_ALL, NULL));
         setlocale(LC_ALL, "");
         for (p = strtok(buf, ","); p != NULL; p = strtok(NULL, ",")) {
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__ANDROID__)
             /* Use utf-8 on Mac OS X */
             unicode = PyUnicode_FromString(p);
 #else

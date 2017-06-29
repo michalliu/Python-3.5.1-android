@@ -20,7 +20,7 @@ extern int winerror_to_errno(int);
 #include <fcntl.h>
 #endif /* HAVE_FCNTL_H */
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__ANDROID__)
 extern wchar_t* _Py_DecodeUTF8_surrogateescape(const char *s, Py_ssize_t size);
 #endif
 
@@ -70,7 +70,7 @@ _Py_device_encoding(int fd)
     Py_RETURN_NONE;
 }
 
-#if !defined(__APPLE__) && !defined(MS_WINDOWS)
+#if !defined(__APPLE__) && !defined(__ANDROID__) && !defined(MS_WINDOWS)
 extern int _Py_normalize_encoding(const char *, char *, size_t);
 
 /* Workaround FreeBSD and OpenIndiana locale encoding issue with the C locale.
@@ -220,7 +220,7 @@ encode_ascii_surrogateescape(const wchar_t *text, size_t *error_pos)
 }
 #endif   /* !defined(__APPLE__) && !defined(MS_WINDOWS) */
 
-#if !defined(__APPLE__) && (!defined(MS_WINDOWS) || !defined(HAVE_MBRTOWC))
+#if !defined(__APPLE__) && !defined(__ANDROID__) && (!defined(MS_WINDOWS) || !defined(HAVE_MBRTOWC))
 static wchar_t*
 decode_ascii_surrogateescape(const char *arg, size_t *size)
 {
@@ -272,7 +272,7 @@ decode_ascii_surrogateescape(const char *arg, size_t *size)
 wchar_t*
 Py_DecodeLocale(const char* arg, size_t *size)
 {
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__ANDROID__)
     wchar_t *wstr;
     wstr = _Py_DecodeUTF8_surrogateescape(arg, strlen(arg));
     if (size != NULL) {
@@ -423,7 +423,7 @@ oom:
 char*
 Py_EncodeLocale(const wchar_t *text, size_t *error_pos)
 {
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__ANDROID__)
     Py_ssize_t len;
     PyObject *unicode, *bytes = NULL;
     char *cpath;

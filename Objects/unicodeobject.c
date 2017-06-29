@@ -3167,13 +3167,22 @@ wcstombs_errorpos(const wchar_t *wstr)
 static int
 locale_error_handler(const char *errors, int *surrogateescape)
 {
+
     if (errors == NULL) {
+#ifdef __ANDROID__
+        *surrogateescape = 1;
+#else
         *surrogateescape = 0;
+#endif
         return 0;
     }
 
     if (strcmp(errors, "strict") == 0) {
+#ifdef __ANDROID__
+        *surrogateescape = 1;
+#else
         *surrogateescape = 0;
+#endif
         return 0;
     }
     if (strcmp(errors, "surrogateescape") == 0) {
@@ -3302,7 +3311,7 @@ PyUnicode_EncodeFSDefault(PyObject *unicode)
 {
 #ifdef HAVE_MBCS
     return PyUnicode_EncodeCodePage(CP_ACP, unicode, NULL);
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__ANDROID__)
     return _PyUnicode_AsUTF8String(unicode, "surrogateescape");
 #else
     PyInterpreterState *interp = PyThreadState_GET()->interp;
@@ -3586,7 +3595,7 @@ PyUnicode_DecodeFSDefaultAndSize(const char *s, Py_ssize_t size)
 {
 #ifdef HAVE_MBCS
     return PyUnicode_DecodeMBCS(s, size, NULL);
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__ANDROID__)
     return PyUnicode_DecodeUTF8Stateful(s, size, "surrogateescape", NULL);
 #else
     PyInterpreterState *interp = PyThreadState_GET()->interp;
@@ -4777,7 +4786,7 @@ onError:
     return NULL;
 }
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__ANDROID__)
 
 /* Simplified UTF-8 decoder using surrogateescape error handler,
    used to decode the command line arguments on Mac OS X.
