@@ -779,7 +779,7 @@ $(IO_OBJS): $(IO_H)
 
 $(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGEN)
 		@$(MKDIR_P) Include
-		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
+		$(HOSTPGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
 $(GRAMMAR_C): $(GRAMMAR_H)
 		touch $(GRAMMAR_C)
 
@@ -1415,6 +1415,7 @@ libainstall:	all python-config
 # Install the dynamically loadable modules
 # This goes into $(exec_prefix)
 sharedinstall: sharedmods
+	CC='$(CC)' LDSHARED='$(BLDSHARED)' LDFLAGS='$(LDFLAGS)' OPT='$(OPT)' CROSS_COMPILE='$(CROSS_COMPILE)' \
 	$(RUNSHARED) $(PYTHON_FOR_BUILD) $(srcdir)/setup.py install \
 	   	--prefix=$(prefix) \
 		--install-scripts=$(BINDIR) \

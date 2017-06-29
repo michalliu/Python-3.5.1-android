@@ -59,13 +59,18 @@ rm -f pybuilddir.txt
 if test "$cross_compiling" = yes; then
     AC_MSG_CHECKING([for python interpreter for cross build])
     if test -z "$PYTHON_FOR_BUILD"; then
-        for interp in python$PACKAGE_VERSION python3 python; do
-	    which $interp >/dev/null 2>&1 || continue
-	    if $interp -c 'import sys;sys.exit(not sys.version_info@<:@:2@:>@ >= (3,3))'; then
-	        break
-	    fi
-            interp=
-	done
+        if test ! -z "$HOSTPYTHON" && PYTHONPATH="$ac_abs_confdir/Lib" "$HOSTPYTHON" -S -c 'import sys;sys.exit(not sys.version_info@<:@:2@:>@ >= (3,3))'; then
+            interp="$HOSTPYTHON"
+        else
+            for interp in python$PACKAGE_VERSION python3 python; do
+	        which $interp >/dev/null 2>&1 || continue
+	        if $interp -c 'import sys;sys.exit(not sys.version_info@<:@:2@:>@ >= (3,3))'; then
+	            break
+	        fi
+                interp=
+	    done
+        fi
+
         if test x$interp = x; then
 	    AC_MSG_ERROR([python$PACKAGE_VERSION interpreter not found])
 	fi
